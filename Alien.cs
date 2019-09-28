@@ -20,6 +20,8 @@ namespace SpaceDarkVaders
         bool _alive = true;
         int _detahStep = 0;
         int _scoreValue = 1;
+        int _columnX = 0, _columnY = 0;
+        uint _lifePoint = 1;
         static Random rng = new Random();
 
         public Bitmap Image { get => _image; private set => _image = value; }
@@ -34,13 +36,16 @@ namespace SpaceDarkVaders
         public bool Alive { get => _alive; set => _alive = value; }
         public int DetahStep { get => _detahStep; set => _detahStep = value; }
         public int ScoreValue { get => _scoreValue; set => _scoreValue = value; }
+        public int ColumnX { get => _columnX; set => _columnX = value; }
+        public int ColumnY { get => _columnY; set => _columnY = value; }
+        public uint LifePoint { get => _lifePoint; set => _lifePoint = value; }
 
         public Alien() : this(DEFAULT_POSITION_X, DEFAULT_POSITION_Y)
         {
 
         }
 
-        public Alien(int x, int y) : this(new Point(x, y))
+        public Alien(int columnX, int columnY) : this(new Point(columnX * 54, columnY * 26))
         {
 
         }
@@ -49,6 +54,8 @@ namespace SpaceDarkVaders
         {
             this.Image = new Bitmap(Properties.Resources.alien1);
             this.Pos = position;
+            this.ColumnX = this.Pos.X / 54;
+            this.ColumnY = this.Pos.Y / 26;
         }
 
 
@@ -77,13 +84,14 @@ namespace SpaceDarkVaders
                     default:
                         break;
                 }
-                
+
             }
         }
 
-        public Alien AlienByColumns(int columnsValueX,int columnsValueY)
+
+        public Alien AlienByColumns(int columnsValueX, int columnsValueY)
         {
-            return new Alien(columnsValueX * 54, columnsValueY * 26);
+            return new Alien(columnsValueX, columnsValueY);
         }
         public void Draw(Graphics g)
         {
@@ -101,10 +109,9 @@ namespace SpaceDarkVaders
             this._pos.X -= value;
         }
 
-        public Lazer Fire(Graphics e)
+        public Lazer Fire()
         {
-            Lazer laz = new Lazer(this.LazPos,10,true);
-            laz.Draw(e);
+            Lazer laz = new Lazer(this.LazPos, 10, true, 1, new Bitmap(Properties.Resources.laserRed));
             return laz;
         }
         public Lazer Fire(int speed)
@@ -118,6 +125,36 @@ namespace SpaceDarkVaders
         public bool InteractWithLazer(Lazer laz)
         {
             return this.ToRectangle().IntersectsWith(laz.ToRectangle());
+        }
+
+        public bool IsDestroyByLaz(Lazer laz)
+        {
+            return (laz.Damage >= this.LifePoint) ? true : false;
+        }
+
+        public void Move()
+        {
+            //if (this.ColumnX >= Form1.MAX_COLUMNS_X)
+            //{
+            //    this.Pos = new Point(0 * 26, (this.ColumnY += 1) * 54);
+            //}
+            //else
+            //{
+            //    this.Pos = new Point((this.ColumnX += 1) * 26, this.ColumnY * 54);
+            //}
+
+
+            //if (this.ColumnX == Form1.MAX_COLUMNS_X)
+            //{
+            //    this.ColumnY += 1;
+            //    this.Pos = new Point(this.ColumnX * 54, this.ColumnY * 26);
+            //}
+            //else
+            //{
+            //    this.ColumnX += 1;
+            //    this.Pos = new Point(this.ColumnX * 54, this.ColumnY * 26);
+            //}
+            this.Pos = new Point(this.ColumnX * 54, (this.ColumnY += 1) * 26);
         }
 
         public void Destroy()

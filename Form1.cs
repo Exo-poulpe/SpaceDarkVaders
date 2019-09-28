@@ -18,9 +18,12 @@ namespace SpaceDarkVaders
     public partial class Form1 : Form
     {
 
-        const int DEFAULT_TIME_PLAYER_FIRE = 2000;
+        public static int DEFAULT_TIME_PLAYER_FIRE = 2000;
+        const int DEFAULT_UPDATE_TIME = 3000;
+        const int DEFAULT_ATTACK_TIMER = 5000;
         const int DEFAULT_ALIEN_VALUE_START = 9;
         const int DEFAULT_WALL_NUMBER = 4;
+        public const int MAX_COLUMNS_X = 9;
 
 
         Player player;
@@ -30,9 +33,14 @@ namespace SpaceDarkVaders
         List<Alien> ListAlien = new List<Alien>();
         List<BrickWall> ListWall = new List<BrickWall>();
         Stopwatch playerFire = new Stopwatch();
+        Stopwatch updateTimer = new Stopwatch();
+        Stopwatch alienAttack = new Stopwatch();
+        Bonus playerBonus;
+        static Random rng = new Random();
         bool bonusPlayer = false;
+        int _niveau = 1;
 
-
+        public int Niveau { get => _niveau; set => _niveau = value; }
 
         public Form1()
         {
@@ -44,6 +52,12 @@ namespace SpaceDarkVaders
             this.FormClosing += OnQuit;
             this.tmr.Tick += Update;
         }
+
+
+        private int Randomise(int min, int max)
+        {
+            return rng.Next(min, max + 1);
+        }
         private void ControlKey(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -52,17 +66,19 @@ namespace SpaceDarkVaders
                     if (playerFire.ElapsedMilliseconds < DEFAULT_TIME_PLAYER_FIRE)
                         break;
                     ListLazerPlayer.Add(player.Fire(this.CreateGraphics()));
-                    SoundPlayer sounds = new SoundPlayer(Properties.Resources.laser6);
-                    sounds.Play();
+                    JukeBox.PlayerLazerSounds();
                     playerFire.Restart();
                     break;
                 case Keys.Right:
-                    player.MoveRight();
+                    player.Direction = 2;
+                    //player.MoveRight();
                     break;
                 case Keys.Left:
-                    player.MoveLeft();
+                    player.Direction = 1;
+                    //player.MoveLeft();
                     break;
                 case Keys.Space:
+                    player.FireBonus(this.playerBonus);
                     bonusPlayer = false;
                     break;
                 default:
@@ -73,72 +89,150 @@ namespace SpaceDarkVaders
         private void InitGame(object sender, EventArgs e)
         {
             player = new Player();
+            UpdateUI();
             playerFire.Start();
+            updateTimer.Start();
+            alienAttack.Start();
             for (int i = 0; i < DEFAULT_WALL_NUMBER; i++)
             {
-                ListWall.Add(new BrickWall(new Point((i+1) * 80, 300)));
+                ListWall.Add(new BrickWall(new Point((i + 1) * 90, 300)));
             }
             for (int i = 0; i < DEFAULT_ALIEN_VALUE_START; i++)
             {
-                Alien tmp = new Alien().AlienByColumns(i, 0);
+                Alien tmp = new Alien(i, 1);
                 ListAlien.Add(tmp);
             }
-
-            MusicThread = new Thread(new ThreadStart(() =>
-            {
-                MediaPlayer backSound = new MediaPlayer();
-                backSound.Open(new Uri(@"D:\C#\SpaceDarkVaders\res\audio\yellow.wav"));
-                backSound.Play();
-            }));
-            MusicThread.Start();
+            JukeBox.BackgroundMusic();
         }
 
         private void OnDraw(object sender, PaintEventArgs e)
         {
             player.Draw(e);
+            UpdateUI();
             ListWall.ForEach((wall) => { wall.Draw(e); });
-            foreach (Alien al in ListAlien)
-            {
-                al.Draw(e);
-            }
+            ListAlien.ForEach((al) => al.Draw(e));
             if (ListLazerPlayer.Count > 0)
             {
-                foreach (Lazer laz in ListLazerPlayer)
-                {
-                    laz.Draw(e);
-                }
+                ListLazerPlayer.ForEach((laz) => laz.Draw(e));
+            }
+            if (ListLazerAlien.Count > 0)
+            {
+                ListLazerAlien.ForEach((laz => laz.Draw(e)));
             }
             if (bonusPlayer)
             {
-                e.Graphics.DrawImage(Properties.Resources.bonus,new Point(0,this.player.Pos.Y));
+                playerBonus.Draw(e);
             }
         }
 
         private void Update(object sender, EventArgs e)
         {
-            if (player.BonusValue >= 5)
+            
+            if (updateTimer.ElapsedMilliseconds >= DEFAULT_UPDATE_TIME)
             {
-                bonusPlayer = true;
+                
+                ListAlien.Reverse();
+                ListAlien.ForEach((al) => { al.Move(); });
+                updateTimer.Restart();
+
+            }
+            switch (player.Direction)
+            {
+                case 0:
+                    break;
+                case 1:
+                    this.player.MoveLeft();
+                    break;
+                case 2:
+                    this.player.MoveRight(2,this.Width);
+                    break;
+                default:
+                    break;
             }
             if (ListLazerPlayer.Count > 0)
             {
-                ListLazerPlayer.ForEach((laz) => 
+                ListLazerPlayer.ForEach((laz) =>
                 {
+                    ListWall.ForEach((wall) => { if (wall.InteractWithLazer(laz)) { ListLazerPlayer.Remove(laz); } });
                     List<Alien> destoyAlien = laz.LaserDestroyAlien(ListAlien);
                     laz.Move();
-                    destoyAlien.ForEach((al) => { al.Destroy();player.UpScore(al.ScoreValue); });
+                    destoyAlien.ForEach((al) =>
+                    {
+                        if (al.IsDestroyByLaz(laz))
+                        {
+                            al.Destroy();
+                            JukeBox.Explose();
+                            player.UpScore(al.ScoreValue);
+                            if (this.player.BonusValue >= 5)
+                            {
+                                bonusPlayer = true;
+                            }
+                            if (bonusPlayer)
+                            {
+                                playerBonus = new Bonus(Randomise(1, 3), new Point(0, this.player.Pos.Y));
+                                this.player.BonusValue = 0;
+                            }
+                        }
+                        else
+                        {
+                            al.LifePoint -= (uint)laz.Damage;
+                        }
+                    });
                 });
 
-                ListLazerAlien.ForEach((laz) => { if (!laz.Alive) ListLazerAlien.Remove(laz); });
-                ListLazerPlayer.ForEach((laz) => { if (!laz.Alive) ListLazerPlayer.Remove(laz); });
-                ListAlien.ForEach((al) => { if (!al.Alive && al.DetahStep >= 3) ListAlien.Remove(al); });
             }
+            
+            if (ListLazerAlien.Count > 0)
+            {
+                ListLazerAlien.ForEach((laz) =>
+                {
+                    ListWall.ForEach((wall) => 
+                    { 
+                        if (wall.InteractWithLazer(laz)) 
+                        {
+                            ListLazerAlien.Remove(laz);
+                        } 
+                    });
+                    laz.Move();
+                    if (laz.LaserDestroyPlayer(this.player))
+                    {
+                        this.player.LifeDownPlayer(laz.Damage);
+                        ListLazerAlien.Remove(laz);
+                    }
+                });
+            }
+            ListLazerAlien.ForEach((laz) => { if (!laz.Alive) ListLazerAlien.Remove(laz); });
+            ListLazerPlayer.ForEach((laz) => { if (!laz.Alive) ListLazerPlayer.Remove(laz); });
+            ListAlien.ForEach((al) => { if (!al.Alive && al.DetahStep >= 3) ListAlien.Remove(al); });
+            if (alienAttack.ElapsedMilliseconds >= DEFAULT_ATTACK_TIMER)
+            {
+                if (Randomise(1, 10) == 10)
+                {
+                    try
+                    {
+                        ListLazerAlien.Add(ListAlien[Randomise(0, Randomise(0, ListAlien.Count - 1))].Fire());
+                        JukeBox.AlienLazerSounds();
+                        alienAttack.Restart();
+                    }
+                    catch (Exception)
+                    {
+                        alienAttack.Restart();
+                    }
+                    
+                }
+            }
+
             this.Invalidate();
+        }
+
+        private void UpdateUI()
+        {
+            this.lblLife.Text = $"PV : {player.LifePoint}  Niv : {this.Niveau}";
         }
 
         private void OnQuit(object sender, EventArgs e)
         {
-
+            JukeBox.Dispose();
         }
     }
 }

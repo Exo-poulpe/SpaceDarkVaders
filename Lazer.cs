@@ -102,6 +102,11 @@ namespace SpaceDarkVaders
             return result;
         }
 
+        public bool LaserDestroyPlayer(Player p)
+        {
+            return this.ToRectangle().IntersectsWith(p.ToRectangle());
+        }
+
 
     }
 }

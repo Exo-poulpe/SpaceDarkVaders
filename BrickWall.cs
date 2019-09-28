@@ -17,21 +17,24 @@ namespace SpaceDarkVaders
         public int SizeY { get => sizeY; set => sizeY = value; }
         public Image Image { get => _image; set => _image = value; }
 
-        public BrickWall(Point position):this(position,10,10)
+        public BrickWall(int x,int y):this(new Point(x,y))
         {
 
         }
-        public BrickWall(Point position, int sizeX, int sizeY)
+        public BrickWall(Point position)
         {
             this.Position = position;
             this.Image = Properties.Resources.wall;
-            this.SizeX = sizeX;
-            this.SizeY = sizeY;
         }
 
         public void Draw(PaintEventArgs e)
         {
             e.Graphics.DrawImage(this.Image,this.Position);
+        }
+
+        public bool InteractWithLazer(Lazer laz)
+        {
+            return this.ToRectangle().IntersectsWith(laz.ToRectangle());
         }
 
         public Rectangle ToRectangle()

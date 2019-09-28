@@ -154,4 +154,25 @@
   <data name="wall" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\img\wall.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="comet" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\img\comet.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="cometBonus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\img\cometBonus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="shieldBonus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\img\shieldBonus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="speedBonnus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\img\speedBonnus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="explosion" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\audio\explosion.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="laser9" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\audio\laser9.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="laserRed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\img\laserRed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
