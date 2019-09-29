@@ -63,7 +63,7 @@ namespace SpaceDarkVaders
             switch (e.KeyCode)
             {
                 case Keys.Up:
-                    if (playerFire.ElapsedMilliseconds < DEFAULT_TIME_PLAYER_FIRE)
+                    if (playerFire.ElapsedMilliseconds < DEFAULT_TIME_PLAYER_FIRE || !this.player.Alive)
                         break;
                     ListLazerPlayer.Add(player.Fire(this.CreateGraphics()));
                     JukeBox.PlayerLazerSounds();
@@ -89,7 +89,6 @@ namespace SpaceDarkVaders
         private void InitGame(object sender, EventArgs e)
         {
             player = new Player();
-            UpdateUI();
             playerFire.Start();
             updateTimer.Start();
             alienAttack.Start();
@@ -103,12 +102,13 @@ namespace SpaceDarkVaders
                 ListAlien.Add(tmp);
             }
             JukeBox.BackgroundMusic();
+            this.Invalidate();
         }
 
         private void OnDraw(object sender, PaintEventArgs e)
         {
             player.Draw(e);
-            UpdateUI();
+            UpdateUI(e);
             ListWall.ForEach((wall) => { wall.Draw(e); });
             ListAlien.ForEach((al) => al.Draw(e));
             if (ListLazerPlayer.Count > 0)
@@ -130,7 +130,8 @@ namespace SpaceDarkVaders
             
             if (updateTimer.ElapsedMilliseconds >= DEFAULT_UPDATE_TIME)
             {
-                
+
+                ListAlien.Sort((al1, al2) => { return al1.ColumnX.CompareTo(al1.ColumnX); });
                 ListAlien.Reverse();
                 ListAlien.ForEach((al) => { al.Move(); });
                 updateTimer.Restart();
@@ -153,7 +154,7 @@ namespace SpaceDarkVaders
             {
                 ListLazerPlayer.ForEach((laz) =>
                 {
-                    ListWall.ForEach((wall) => { if (wall.InteractWithLazer(laz)) { ListLazerPlayer.Remove(laz); } });
+                    ListWall.ForEach((wall) => { if (wall.InteractWithLazer(laz)) { ListLazerPlayer.Remove(laz);wall.LifeDown(laz.Damage); } if (wall.LifePoint <= 0) { ListWall.Remove(wall); } });
                     List<Alien> destoyAlien = laz.LaserDestroyAlien(ListAlien);
                     laz.Move();
                     destoyAlien.ForEach((al) =>
@@ -190,6 +191,7 @@ namespace SpaceDarkVaders
                     { 
                         if (wall.InteractWithLazer(laz)) 
                         {
+                            wall.LifeDown(laz.Damage);
                             ListLazerAlien.Remove(laz);
                         } 
                     });
@@ -197,6 +199,13 @@ namespace SpaceDarkVaders
                     if (laz.LaserDestroyPlayer(this.player))
                     {
                         this.player.LifeDownPlayer(laz.Damage);
+                        if(player.LifePoint <= 0)
+                        {
+                            this.player.Dead();
+                            ListAlien.RemoveRange(0, ListAlien.Count);
+                            ListWall.RemoveRange(0, ListWall.Count);
+                            JukeBox.Dispose();
+                        }
                         ListLazerAlien.Remove(laz);
                     }
                 });
@@ -225,9 +234,12 @@ namespace SpaceDarkVaders
             this.Invalidate();
         }
 
-        private void UpdateUI()
+        private void UpdateUI(PaintEventArgs e)
         {
-            this.lblLife.Text = $"PV : {player.LifePoint}  Niv : {this.Niveau}";
+            this.player.DrawLifePlayer(e);
+            if (!this.player.Alive)
+                this.player.DrawDead(e);
+            
         }
 
         private void OnQuit(object sender, EventArgs e)

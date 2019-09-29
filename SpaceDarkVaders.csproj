@@ -101,6 +101,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="res\audio\yellow.wav" />
+    <None Include="res\img\playerLife.png" />
+    <None Include="res\img\wallDamaged3.png" />
+    <None Include="res\img\wallDamaged2.png" />
+    <None Include="res\img\wallDamaged1.png" />
     <None Include="res\img\laserRed.png" />
     <None Include="res\audio\laser9.wav" />
     <None Include="res\audio\laser9.mp3" />

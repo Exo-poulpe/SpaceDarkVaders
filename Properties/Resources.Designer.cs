@@ -113,9 +113,9 @@ namespace SpaceDarkVaders.Properties {
         /// <summary>
         ///   Recherche une ressource localisée de type System.IO.UnmanagedMemoryStream semblable à System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream explosion {
+        internal static System.IO.UnmanagedMemoryStream explose {
             get {
-                return ResourceManager.GetStream("explosion", resourceCulture);
+                return ResourceManager.GetStream("explose", resourceCulture);
             }
         }
         
@@ -219,6 +219,16 @@ namespace SpaceDarkVaders.Properties {
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap playerLife {
+            get {
+                object obj = ResourceManager.GetObject("playerLife", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap shieldBonus {
             get {
                 object obj = ResourceManager.GetObject("shieldBonus", resourceCulture);
@@ -243,6 +253,45 @@ namespace SpaceDarkVaders.Properties {
             get {
                 object obj = ResourceManager.GetObject("wall", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap wallDamaged1 {
+            get {
+                object obj = ResourceManager.GetObject("wallDamaged1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap wallDamaged2 {
+            get {
+                object obj = ResourceManager.GetObject("wallDamaged2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap wallDamaged3 {
+            get {
+                object obj = ResourceManager.GetObject("wallDamaged3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une ressource localisée de type System.IO.UnmanagedMemoryStream semblable à System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream yellow {
+            get {
+                return ResourceManager.GetStream("yellow", resourceCulture);
             }
         }
     }

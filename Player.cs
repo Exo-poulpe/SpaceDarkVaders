@@ -15,12 +15,14 @@ namespace SpaceDarkVaders
         Bitmap _image;
         Point _pos;
         Point _lazPos;
+        Point _lifePosition;
         uint _scoreValue = 0;
         int _bonusValue = 0;
-        int _lifePoint = 3;
+        int _lifePoint = 2;
         int _damage = 1;
         int _lazSpeed = 10;
         int _direction = 0;
+        bool _alive = true;
 
         public Bitmap Image { get => _image; private set => _image = value; }
         public Point Pos { get => _pos; private set => _pos = value; }
@@ -35,6 +37,8 @@ namespace SpaceDarkVaders
         public int Damage { get => _damage; set => _damage = value; }
         public int LazSpeed { get => _lazSpeed; set => _lazSpeed = value; }
         public int Direction { get => _direction; set => _direction = value; }
+        public Point LifePosition { get => _lifePosition; set => _lifePosition = value; }
+        public bool Alive { get => _alive; set => _alive = value; }
 
         public Player() : this(DEFAULT_POSITION_X, DEFAULT_POSITION_Y)
         {
@@ -50,15 +54,30 @@ namespace SpaceDarkVaders
         {
             this.Image = new Bitmap(Properties.Resources.player);
             this.Pos = position;
+            this.LifePosition = new Point(30, 0);
         }
 
         public void Draw(PaintEventArgs g)
         {
-            g.Graphics.DrawImage(this.Image, this.Pos);
+            if(this.Alive)
+            {
+                g.Graphics.DrawImage(this.Image, this.Pos);
+            }
         }
-        public void Draw(Graphics g)
+
+        public void DrawLifePlayer(PaintEventArgs g)
         {
-            g.DrawImage(this.Image, this.Pos);
+            for (int i = 0; i < LifePoint; i += 1)
+            {
+                g.Graphics.DrawString("PV : ", new Font(FontFamily.GenericSansSerif,9, FontStyle.Bold),Brushes.BlueViolet,0,5);
+                g.Graphics.DrawString($"Score : {this.ScoreValue}", new Font(FontFamily.GenericSansSerif,9, FontStyle.Bold),Brushes.BlueViolet,200,5);
+                g.Graphics.DrawImage(new Bitmap(Properties.Resources.playerLife), new Point(this.LifePosition.X + (this.PlayerSize.Width / 2) * i, this.LifePosition.Y));
+            }
+        }
+
+        public void DrawDead(PaintEventArgs g)
+        {
+            g.Graphics.DrawString($"GAME OVER", new Font(FontFamily.GenericSansSerif, 26, FontStyle.Bold), Brushes.BlueViolet, 130, 200);
         }
 
         public void MoveRight(int value = 2, int sizeWindow = 400)
@@ -100,10 +119,6 @@ namespace SpaceDarkVaders
             laz.Draw(e);
             return laz;
         }
-        public Lazer Fire(int speed)
-        {
-            return null;
-        }
 
         public void FireBonus(Bonus bonus)
         {
@@ -141,6 +156,7 @@ namespace SpaceDarkVaders
             }
         }
 
+
         public void LifeDownPlayer(int value = 1)
         {
             this.LifePoint -= value;
@@ -149,6 +165,11 @@ namespace SpaceDarkVaders
         public void LifeUpPlayer(int value = 1)
         {
             this.LifePoint += value;
+        }
+
+        public void Dead()
+        {
+            this.Alive = false;
         }
 
     }

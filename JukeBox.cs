@@ -11,39 +11,56 @@ namespace SpaceDarkVaders
     static class JukeBox
     {
         static Thread MusicThread;
+        private static bool _mute = false;
+
+        public static bool Mute { get => _mute; set => _mute = value; }
+
         public static void PlayerLazerSounds()
         {
-            SoundPlayer sounds = new SoundPlayer(Properties.Resources.laser6);
-            sounds.Play();
+            if (!Mute)
+            {
+                SoundPlayer sounds = new SoundPlayer(Properties.Resources.laser6);
+                sounds.Play();
+            }
         }
 
         public static void AlienLazerSounds()
         {
-            SoundPlayer sounds = new SoundPlayer(Properties.Resources.laser9);
-            sounds.Play();
+            if (!Mute)
+            {
+                SoundPlayer sounds = new SoundPlayer(Properties.Resources.laser9);
+                sounds.Play();
+            }
         }
 
         public static void Explose()
         {
-            MediaPlayer backSound = new MediaPlayer();
-            backSound.Open(new Uri(@"D:\C#\SpaceDarkVaders\res\audio\explosion.wav"));
-            backSound.Play();
+            if (!Mute)
+            {
+                MediaPlayer backSound = new MediaPlayer();
+                backSound.Open(new Uri(@"D:\C#\SpaceDarkVaders\res\audio\explosion.wav"));
+                backSound.Play();
+            }
         }
 
         public static void BackgroundMusic()
         {
-            MusicThread = new Thread(new ThreadStart(() =>
+            if (!Mute)
             {
-                MediaPlayer backSound = new MediaPlayer();
-                backSound.Open(new Uri(@"D:\C#\SpaceDarkVaders\res\audio\yellow.wav"));
-                backSound.Play();
-            }));
-            MusicThread.Start();
+                MusicThread = new Thread(new ThreadStart(() =>
+                {
+                    MediaPlayer backSound = new MediaPlayer();
+                    backSound.Open(new Uri(@"D:\C#\SpaceDarkVaders\res\audio\yellow.wav"));
+                    backSound.Play();
+                }));
+                MusicThread.Start();
+            }
         }
 
         public static void Dispose()
         {
             MusicThread.Abort();
+            Mute = true;
         }
     }
 }

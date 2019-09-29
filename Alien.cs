@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace SpaceDarkVaders
 {
-    class Alien : Vessel
+    class Alien : Vessel, IComparable
     {
 
         const int DEFAULT_POSITION_X = 210;
@@ -154,7 +154,17 @@ namespace SpaceDarkVaders
             //    this.ColumnX += 1;
             //    this.Pos = new Point(this.ColumnX * 54, this.ColumnY * 26);
             //}
-            this.Pos = new Point(this.ColumnX * 54, (this.ColumnY += 1) * 26);
+
+            if (this.ColumnX >= Form1.MAX_COLUMNS_X - 1)
+            {
+                this.ColumnX = 1;
+                this.ColumnY += 1;
+            }
+            else if(this.ColumnX < Form1.MAX_COLUMNS_X - 1)
+            {
+                this.ColumnX += 1;
+            }
+            this.Pos = new Point(this.ColumnX * 54, this.ColumnY * 26);
         }
 
         public void Destroy()
@@ -162,5 +172,10 @@ namespace SpaceDarkVaders
             Alive = false;
         }
 
+        public int CompareTo(object obj)
+        {
+            Alien tmp = (Alien)obj;
+            return this.ColumnX.CompareTo(tmp.ColumnX);
+        }
     }
 }
